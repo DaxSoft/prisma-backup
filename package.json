@@ -1,0 +1,61 @@
+{
+    "name": "@vorlefan/prisma-backup",
+    "version": "0.1.2",
+    "description": "Export all the databse models into json files and use them as backup",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "author": {
+        "name": "Michael Willian Santos",
+        "email": "dax-soft@live.com",
+        "url": "https://daxsoft.github.io/"
+    },
+    "keywords": [
+        "prisma",
+        "database",
+        "files",
+        "backup",
+        "json"
+    ],
+    "license": "MIT",
+    "private": false,
+    "devDependencies": {
+        "@babel/core": "lastest",
+        "@types/jest": "lastest",
+        "@types/node": "lastest",
+        "@typescript-eslint/eslint-plugin": "lastest",
+        "@typescript-eslint/parser": "lastest",
+        "babel-loader": "lastest",
+        "bundlesize": "lastest",
+        "eslint": "lastest",
+        "eslint-config-prettier": "lastest",
+        "eslint-plugin-prettier": "lastest",
+        "jest": "lastest",
+        "nodemon": "lastest",
+        "ts-jest": "lastest",
+        "ts-loader": "lastest",
+        "typescript": "lastest",
+        "webpack": "lastest",
+        "webpack-cli": "lastest"
+    },
+    "publishConfig": {
+        "access": "public"
+    },
+    "scripts": {
+        "build": "webpack --mode production & yarn run size",
+        "lint": "eslint './src/**/*.{js,ts,tsx}'",
+        "test": "jest",
+        "test:watch": "jest --watchAll",
+        "watch": "tsc -w",
+        "start": "npm link && nodemon",
+        "semantic-release": "semantic-release",
+        "size": "bundlesize"
+    },
+    "files": [
+        "dist/**/*"
+    ],
+    "repository": "daxsoft/prisma_backup",
+    "dependencies": {
+        "@prisma/client": "^2.17.0",
+        "@vorlefan/path": "^1.7.3"
+    }
+}
