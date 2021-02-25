@@ -4,18 +4,18 @@ Use this module to create a backup measure for your project that uses Prisma. Yo
 Example: Let's say that you need to change a unique key (email) to another like (code). You can backup first,
 then change the schema.prisma, and use the function of PrismaBackupImport to inject the old information.
 
-[![https://badgen.net/bundlephobia/minzip/@vorlefan/prisma_backup](https://badgen.net/bundlephobia/minzip/@vorlefan/prisma_backup)](https://bundlephobia.com/result?p=@vorlefan/prisma_backup)]
+[![https://badgen.net/bundlephobia/minzip/@vorlefan/prisma-backup](https://badgen.net/bundlephobia/minzip/@vorlefan/prisma-backup)](https://bundlephobia.com/result?p=@vorlefan/prisma-backup)]
 
 With [npm](https://npmjs.org) do:
 
 ```
-npm install @vorlefan/prisma_backup
+npm install @vorlefan/prisma-backup
 ```
 
 With [yarn](https://yarnpkg.com/en/) do:
 
 ```
-yarn add  @vorlefan/prisma_backup
+yarn add  @vorlefan/prisma-backup
 ```
 
 <hr>
