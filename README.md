@@ -2,7 +2,9 @@
 
 Use this module to create a backup measure for your project that uses Prisma. You can either backup the information, or use them to migrate to another database, or just to reset the database.
 Example: Let's say that you need to change a unique key (email) to another like (code). You can backup first,
-then change the schema.prisma, and use the function of PrismaBackupImport to inject the old information.
+then change the schema.prisma, and use this module to inject the old information.
+
+In truth, this work with any database, ORM and etc, the only thing you need is that the models returns a Object (that has as value a array of objects).
 
 [![https://badgen.net/bundlephobia/minzip/@vorlefan/prisma-backup](https://badgen.net/bundlephobia/minzip/@vorlefan/prisma-backup)](https://bundlephobia.com/result?p=@vorlefan/prisma-backup)]
 
@@ -22,57 +24,101 @@ yarn add  @vorlefan/prisma-backup
 
 ### Documentation
 
-You can access on the folder 'docs' of this repository
 A better documentation will be made at the near future.
+
+```ts
+import { backup } from '@vorlefan/prisma-backup';
+
+// The 'backup' function is async and has these properties
+
+export type BackupProps = {
+    encrypt?: boolean; // true to encrypt data
+    password?: string; // if encrypt is true, then is required
+    folder?: string; // folder that will be saved the data generated
+    models:  Record<string, Array<Record<any, any>>>; // models from prisma
+    onRoute?: (route: PathRoute) => any; // define the route save
+    backupFolderName?: string; // backup folder name that will be generated, by default is 'Date.now()'
+};
+
+await backup(props: BackupProps)
+```
 
 <hr>
 
 ### Highlight
 
 -   Create json backup of your database in fragments
--   Easy to setup and choose what to backup
--   Easy to reinject the backup
+-   Easy to setup and choose what models to backup
+-   You can encrypt your backup with a password
 
 <hr>
 
-### Example of Export
+### Example
 
-Please, take a look at the 'example/export' folder of this repository
+Please, take a look at the 'example/backup_test/.db' folder of this repository
 
 ```ts
-
-import {
-    PrismaClient,
-    UserRole,
-} from '@prisma/client';
-import { PrismaBackupExport } from '@vorlefan/prisma-backup';
+import { PrismaClient } from '@prisma/client';
+import { backup } from '@vorlefan/prisma-backup';
 
 const prisma = new PrismaClient();
 
 void (async function () {
-    try {
-        await PrismaBackupExport({
-            models: {
-                user: () => prisma.user.findMany,
-            },
-            enums: {
-                userRole: () => UserRole,
-            },
-            onRoute: (route) => {
-                // If this function isn't set, then gonna save on a new folder named prisma.backup under
-                // the root folder of your project. You can use this function to change it.
-                // See @vorlefan/path
-                route.remove('prisma.backup');
-                route.set(
-                    'prisma.backup',
-                    route.plug('root', 'database-export')
-                );
-            },
-        });
-    } catch (error) {
-        console.error(error);
-    }
+    const [user] = await prisma.$transaction([prisma.user.findMany({})]);
+
+    // w/out encrypt
+
+    await backup({
+        models: {
+            user,
+        },
+    });
+
+    // w/ encrypt
+
+    await backup({
+        models: {
+            user,
+        },
+        encrypt: true,
+        password: 'pwd123',
+    });
 })();
+```
 
+### Splitting models
 
+```ts
+import { PrismaClient } from '@prisma/client';
+import { backup } from '@vorlefan/prisma-backup';
+import { BackupModels } from '@vorlefan/prisma-backup/dist/types/backup';
+
+const prisma = new PrismaClient();
+
+function chunk(array: Array<any>, size = 2) {
+    return Array.from(
+        {
+            length: Math.ceil(array.length / size),
+        },
+        (v, i) => array.slice(i * size, i * size + size)
+    );
+}
+
+void (async function () {
+    const user = await prisma.user.findMany();
+
+    const models: BackupModels = {};
+
+    const users = chunk(user, 2);
+
+    users.map((model, i) => {
+        const key = `user_${i}`;
+        models[key] = model;
+    });
+
+    await backup({
+        models,
+        backupFolderName: 'user',
+    });
+})();
 ```

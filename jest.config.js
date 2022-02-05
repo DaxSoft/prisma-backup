@@ -2,7 +2,7 @@
 
 module.exports = {
     collectCoverage: true,
-    collectCoverageFrom: ['src/**/*.ts', 'src/**/*.js'],
+    collectCoverageFrom: ['src/__tests__/*.ts'],
     coverageThreshold: {
         global: {
             branches: 100,

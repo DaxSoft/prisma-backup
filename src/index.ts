@@ -1,7 +1,9 @@
 /*
 :--------------------------------------------------------------------------
-: @vorlefan/prisma_backup
+: @vorlefan/prisma-backup
 :--------------------------------------------------------------------------
 */
 
-export { PrismaBackupExport } from './export';
+export { decrypt, encrypt } from './modules/crypto';
+export { Route } from './modules/route';
+export { backup } from './modules/backup';
