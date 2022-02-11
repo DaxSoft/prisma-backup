@@ -1,5 +1,5 @@
 import { BackupModels } from '../types/backup';
-import { backup } from '../modules/backup';
+import { runBackup } from '../modules/backup';
 import { PathRoute } from '@vorlefan/path';
 
 const TMP_BACKUP_FOLDER = 'backup_test';
@@ -21,9 +21,9 @@ const models: BackupModels = {
     ],
 };
 
-describe('Backup', () => {
+describe('Backup & GetBackup', () => {
     test('Without encrypting', async () => {
-        await backup({
+        await runBackup({
             models,
             onRoute: function (route) {
                 route.remove('root');

@@ -72,7 +72,7 @@ export class BackupModel {
         }
 
         const data: BackupModelFileEncrypted = {
-            iv: dataEncrypted.iv.toString('hex'),
+            iv: dataEncrypted.iv,
             encrypted: dataEncrypted.encryptedText,
         };
 

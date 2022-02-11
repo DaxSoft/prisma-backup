@@ -6,4 +6,5 @@
 
 export { decrypt, encrypt } from './modules/crypto';
 export { Route } from './modules/route';
-export { backup } from './modules/backup';
+export { runBackup } from './modules/backup';
+export { getBackup } from './modules/get-backup';

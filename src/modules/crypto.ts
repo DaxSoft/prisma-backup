@@ -15,6 +15,7 @@ export async function encrypt({
         if (key === undefined) return reject(undefined);
 
         const iv = crypto.randomBytes(12);
+        const _iv = JSON.stringify(iv);
 
         const cypher = crypto.createCipheriv('aes-192-ccm', key, iv, {
             authTagLength: 12,
@@ -25,7 +26,7 @@ export async function encrypt({
         cypher.on('data', (chunk) => {
             encryptedText += chunk;
         });
-        cypher.on('end', () => resolve({ encryptedText, iv }));
+        cypher.on('end', () => resolve({ encryptedText, iv: _iv }));
         cypher.on('error', () => reject(undefined));
         cypher.write(text);
 
@@ -43,10 +44,12 @@ export async function decrypt({
             return reject(undefined);
         }
 
+        const resolveIv = Buffer.from(JSON.parse(iv));
+
         const key = await genCryptoKey(password, 'salt', 24);
         if (key === undefined) return reject(undefined);
 
-        const decipher = crypto.createCipheriv('aes-192-ccm', key, iv, {
+        const decipher = crypto.createCipheriv('aes-192-ccm', key, resolveIv, {
             authTagLength: 12,
         });
 

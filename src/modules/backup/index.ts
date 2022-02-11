@@ -3,14 +3,28 @@ import { Route } from '../route';
 import { recursiveModels } from './models';
 import cli from 'cli-progress';
 import colors from 'ansi-colors';
+import { compressBackup } from './compress';
 
-export async function backup({
+/**
+ * @function runBackup
+ * @description save models objects into json
+ * @param {Object} models each key is the filename
+ * @param {String} password (optional) if encrypt is true, then requires the password
+ * @param {Boolean} encrypt (optional, default = false) to encrypt file
+ * @param {String} folder (optional, default = '.db') in which name will be folder that will gets all backup?
+ * @param {Function} onRoute (optional) defines the route
+ * @param {String} backupFolderName (optional, default = Date.now()) the name for backup folder that will be generated
+ * @param {Boolean} compress (optional, default = false) compress the folder into a zip file?
+ * @returns
+ */
+export async function runBackup({
     models,
     password,
     encrypt = false,
     folder = '.db',
     onRoute,
     backupFolderName,
+    compress = false,
 }: BackupProps): Promise<boolean> {
     try {
         if (encrypt === true) {
@@ -51,7 +65,7 @@ export async function backup({
             hideCursor: true,
         });
 
-        progress.start(keys.length, 0);
+        progress.start(compress ? keys.length + 1 : keys.length, 0);
 
         await recursiveModels({
             models,
@@ -62,6 +76,10 @@ export async function backup({
             keys,
             progress,
         });
+
+        if (compress === true) {
+            await compressBackup(Route, progress);
+        }
 
         progress.stop();
         return true;

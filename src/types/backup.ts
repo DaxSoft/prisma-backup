@@ -1,4 +1,6 @@
+import { IFileManager_Files } from '@vorlefan/path/dist/types';
 import { PathRoute } from '@vorlefan/path';
+import { GetBackupHelper } from '../modules/get-backup/models/helper';
 
 export type BackupModelsValue = Array<Record<any, any>>;
 export type BackupModels = Record<string, BackupModelsValue>;
@@ -10,6 +12,7 @@ export type BackupProps = {
     models: BackupModels;
     onRoute?: (route: PathRoute) => any;
     backupFolderName?: string;
+    compress?: boolean;
 };
 
 export type BackupRecursiveProps = {
@@ -34,4 +37,22 @@ export type BackupModelProps = {
 export type BackupModelFileEncrypted = {
     iv: string;
     encrypted: string;
+};
+
+export type GetBackupOnCurrentModelPropsContext = {
+    instance: GetBackupHelper;
+    currentModel: Record<any, any>;
+    currentFile: IFileManager_Files;
+};
+
+export type GetBackupOnCurrentModelProps = (
+    props: GetBackupOnCurrentModelPropsContext
+) => Promise<void>;
+
+export type GetBackupProps = {
+    password?: string;
+    folder?: string;
+    backupFolderName?: string;
+    onRoute?: (route: PathRoute) => any;
+    onCurrentModel: GetBackupOnCurrentModelProps;
 };

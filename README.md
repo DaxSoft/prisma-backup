@@ -27,7 +27,7 @@ yarn add  @vorlefan/prisma-backup
 A better documentation will be made at the near future.
 
 ```ts
-import { backup } from '@vorlefan/prisma-backup';
+import { runBackup, getBackup } from '@vorlefan/prisma-backup';
 
 // The 'backup' function is async and has these properties
 
@@ -40,7 +40,19 @@ export type BackupProps = {
     backupFolderName?: string; // backup folder name that will be generated, by default is 'Date.now()'
 };
 
-await backup(props: BackupProps)
+await runBackup(props: BackupProps)
+
+// To get the bakcup
+
+export type GetBackupProps = {
+    password?: string; // if is encrypted, then is required
+    folder?: string; // the general folder, by default is '.db'
+    backupFolderName?: string; // instend of getting the most recent folder of backup, you can define to get from one
+    onRoute?: (route: PathRoute) => any; // define the route
+    onCurrentModel: GetBackupOnCurrentModelProps; // async function to handle each model
+};
+
+await getBackup(props: GetBackupProps)
 ```
 
 <hr>
@@ -50,6 +62,7 @@ await backup(props: BackupProps)
 -   Create json backup of your database in fragments
 -   Easy to setup and choose what models to backup
 -   You can encrypt your backup with a password
+-   Method to handle the importing of backup data
 
 <hr>
 
@@ -59,7 +72,7 @@ Please, take a look at the 'example/backup_test/.db' folder of this repository
 
 ```ts
 import { PrismaClient } from '@prisma/client';
-import { backup } from '@vorlefan/prisma-backup';
+import { runBackup } from '@vorlefan/prisma-backup';
 
 const prisma = new PrismaClient();
 
@@ -68,7 +81,7 @@ void (async function () {
 
     // w/out encrypt
 
-    await backup({
+    await runBackup({
         models: {
             user,
         },
@@ -76,7 +89,7 @@ void (async function () {
 
     // w/ encrypt
 
-    await backup({
+    await runBackup({
         models: {
             user,
         },
@@ -90,7 +103,7 @@ void (async function () {
 
 ```ts
 import { PrismaClient } from '@prisma/client';
-import { backup } from '@vorlefan/prisma-backup';
+import { runBackup } from '@vorlefan/prisma-backup';
 import { BackupModels } from '@vorlefan/prisma-backup/dist/types/backup';
 
 const prisma = new PrismaClient();
@@ -116,9 +129,35 @@ void (async function () {
         models[key] = model;
     });
 
-    await backup({
+    await runBackup({
         models,
         backupFolderName: 'user',
     });
 })();
+```
+
+### Get the backup data, example
+
+```ts
+import { getBackup } from '@vorlefan/prisma-backup';
+
+await getBackup({
+    onCurrentModel: async function ({ instance, currentModel, currentFile }) {
+        if (currentFile.name === 'user') {
+            const data = currentModel;
+            await instance.route.json().store({
+                routeName: '@',
+                filename: `${Date.now().toString(16)}.json`, /// `${data.name}.json`,
+                data,
+            });
+        }
+    },
+    folder: '.db',
+    onRoute: function (route) {
+        route.remove('root');
+        route.set('root', route.resolve(__dirname, '..'));
+    },
+    password: 'pwd123',
+    backupFolderName: 'encrypted',
+});
 ```

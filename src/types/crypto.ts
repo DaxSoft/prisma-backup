@@ -5,11 +5,11 @@ export type EncryptDataProps = {
 
 export type EncryptDataResult = {
     encryptedText: string;
-    iv: Buffer;
+    iv: string;
 };
 
 export type DecryptDataProps = {
     password: string;
     encryptedText?: string;
-    iv?: Buffer;
+    iv?: string;
 };
