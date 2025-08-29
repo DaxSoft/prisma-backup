@@ -9,6 +9,8 @@ export type PrismaBackupArgs = {
   offset?: {
     [tableName: string]: OffsetConfig;
   };
+  encrypt?: boolean;
+  password?: string;
 };
 
 export type QueryTableNameWithRowCount = { table_name: string; row_count: number };

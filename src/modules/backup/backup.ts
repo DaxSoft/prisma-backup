@@ -1,16 +1,31 @@
+import { takeLeft } from './../../../node_modules/effect/src/String';
 import type { PrismaClient } from '@prisma/client';
 import { HandleError } from '../../decorators/handle-error.decorator';
-import { PrismaBackupError, PrismaBackupGetAllTableNameError, PrismaBackupSaveTableJsonError } from './backup-error';
+import {
+  PrismaBackupError,
+  PrismaBackupGetAllTableNameError,
+  PrismaBackupQueryDataError,
+  PrismaBackupSaveTableJsonError,
+  PrismaBackupTransformDataError,
+} from './backup-error';
 import type { OffsetConfig, PrismaBackupArgs, QueryTableNameWithRowCount } from '../../types';
 import { PathRoute } from '@vorlefan/path';
 import { Route } from '../path-route';
 import { sanitizeFilename } from '../../utils/utils';
+import { encrypt } from '../crypto';
 
 export class PrismaBackup {
   private route: PathRoute = Route;
 
   constructor(private readonly prismaClient: PrismaClient, private readonly args: PrismaBackupArgs) {
     this.route.inject(this.args.folderName, this.args?.isTesting ? 'main' : 'root').alias('@', this.args.folderName);
+    if (this.args?.encrypt === true) {
+      if (!this?.args?.password || this?.args?.password.length < 5) {
+        throw new Error(
+          'If the encrypt is set true, then it is required a password. The password must be at least 5 length'
+        );
+      }
+    }
   }
 
   @HandleError((cause) => new PrismaBackupError(cause))
@@ -40,8 +55,7 @@ export class PrismaBackup {
         OFFSET ${offset}
         LIMIT ${offsetConfig.limit};
       `;
-
-      const batch: any[] = await this.prismaClient.$queryRawUnsafe(query);
+      const batch: any[] = await this.queryData(query);
 
       // If the database returns nothing, we are definitely done.
       if (batch.length === 0) {
@@ -56,8 +70,10 @@ export class PrismaBackup {
     const filename = sanitizeFilename(`${table.table_name}.json`);
     const filepath = this.route.plug('@', filename)!;
 
-    const data = allRows.map((row: any) => ({ ...row, __table_name: table.table_name, __row_count: table.row_count }));
-    const status = await this.route.stream().write(filepath, JSON.stringify(data));
+    const data = this.transformQueryData(allRows, table);
+    const content = await this.transformContent(JSON.stringify(data));
+
+    const status = await this.route.stream().write(filepath, content);
 
     if (!status) {
       throw new Error(`ERROR: Backup for table, ${table.table_name} that has ${table.row_count} rows.\n\t${filepath}`);
@@ -68,12 +84,14 @@ export class PrismaBackup {
 
   @HandleError((cause) => new PrismaBackupSaveTableJsonError(cause))
   protected async saveTable(table: QueryTableNameWithRowCount) {
-    const rows = await this.prismaClient.$queryRawUnsafe(`SELECT * FROM "${table.table_name}";`);
+    const rows = await this.queryData(`SELECT * FROM "${table.table_name}";`);
     const filename = sanitizeFilename(`${table.table_name}.json`);
     const filepath = this.route.plug('@', filename)!;
 
-    const data = rows.map((row: any) => ({ ...row, __table_name: table.table_name, __row_count: table.row_count }));
-    const status = await this.route.stream().write(filepath, JSON.stringify(data));
+    const data = this.transformQueryData(rows, table);
+    const content = await this.transformContent(JSON.stringify(data));
+
+    const status = await this.route.stream().write(filepath, content);
 
     if (!status) {
       throw new Error(`ERROR: Backup for table, ${table.table_name} that has ${table.row_count} rows.\n\t${filepath}`);
@@ -99,21 +117,24 @@ export class PrismaBackup {
     }));
   }
 
-  /**
-   * Safely formats a value for use in a raw SQL query.
-   * @param value The value to format (string, number, Date).
-   */
-  private formatCursorValue(value: any): string {
-    if (typeof value === 'string') {
-      // Basic escaping for single quotes and wrap in quotes
-      const escapedValue = value.replace(/'/g, "''");
-      return `'${escapedValue}'`;
+  @HandleError((cause) => new PrismaBackupQueryDataError(cause))
+  protected async queryData(query: string): Promise<Array<any>> {
+    return this.prismaClient.$queryRawUnsafe(query);
+  }
+
+  @HandleError((cause) => new PrismaBackupTransformDataError(cause))
+  protected transformQueryData(query: any[], { table_name, row_count }: QueryTableNameWithRowCount): Array<any> {
+    const rows = query.map((row: any) => ({ ...row, __table_name: table_name, __row_count: row_count }));
+
+    return rows;
+  }
+
+  @HandleError((cause) => new PrismaBackupTransformDataError(cause))
+  protected async transformContent(content: string): Promise<string> {
+    if (this.args?.encrypt && this.args?.password) {
+      const data = await encrypt({ password: this.args.password, text: content });
+      return JSON.stringify(data);
     }
-    if (value instanceof Date) {
-      // Format date to ISO string and wrap in quotes
-      return `'${value.toISOString()}'`;
-    }
-    // For numbers and other types, just convert to string
-    return String(value);
+    return content;
   }
 }

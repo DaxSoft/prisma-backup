@@ -25,3 +25,21 @@ export class PrismaBackupSaveTableJsonError extends TaggedError<'PrismaBackupSav
     );
   }
 }
+
+export class PrismaBackupQueryDataError extends TaggedError<'PrismaBackupQueryDataError'> {
+  constructor(cause?: unknown) {
+    super('PrismaBackupQueryDataError', 'A error occured when trying to query data', cause);
+  }
+}
+
+export class PrismaBackupTransformDataError extends TaggedError<'PrismaBackupTransformDataError'> {
+  constructor(cause?: unknown) {
+    super('PrismaBackupTransformDataError', 'A error occured when trying to transform query data', cause);
+  }
+}
+
+export class PrismaBackupTransformContentError extends TaggedError<'PrismaBackupTransformContentError'> {
+  constructor(cause?: unknown) {
+    super('PrismaBackupTransformContentError', 'A error occured when trying to transform content data', cause);
+  }
+}

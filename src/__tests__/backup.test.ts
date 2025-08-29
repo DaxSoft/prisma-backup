@@ -4,6 +4,7 @@ import { PrismaClient } from '../../prisma/generated/prisma/client/client';
 import { Route } from '../modules/path-route';
 
 const TMP_BACKUP_FOLDER = 'example/backup_test';
+const TMP_BACKUP_ENCRYPT_FOLDER = 'example/backup_test_encrypt';
 
 const prisma = new PrismaClient();
 
@@ -20,6 +21,24 @@ describe('PrismaBackup', () => {
     await backup.run();
 
     const files = await Route.files(TMP_BACKUP_FOLDER);
+    expect(files.length > 0).toBeTruthy();
+    expect(!!files?.find((d) => d.name === '_prisma_migrations')).toBeTruthy();
+  });
+
+  test('With encrypting', async () => {
+    const backup = new PrismaBackup(prisma, {
+      folderName: TMP_BACKUP_ENCRYPT_FOLDER,
+      database: 'postgres',
+      isTesting: true,
+      offset: {
+        User: { limit: 50 },
+      },
+      encrypt: true,
+      password: 'Senha060653',
+    });
+    await backup.run();
+
+    const files = await Route.files(TMP_BACKUP_ENCRYPT_FOLDER);
     expect(files.length > 0).toBeTruthy();
     expect(!!files?.find((d) => d.name === '_prisma_migrations')).toBeTruthy();
   });
