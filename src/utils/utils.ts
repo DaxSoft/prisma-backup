@@ -24,3 +24,8 @@ export function sanitizeFilename(str: string): string {
     .replace(/\s/gim, '_');
   return sanitized.split('').splice(0, 255).join('');
 }
+
+export function toCamelCase(str: string): string {
+  if (!str) return '';
+  return str.charAt(0).toLowerCase() + str.slice(1);
+}
