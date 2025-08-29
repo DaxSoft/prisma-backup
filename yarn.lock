@@ -1693,11 +1693,6 @@ eastasianwidth@^0.2.0:
   resolved "https://registry.npmjs.org/eastasianwidth/-/eastasianwidth-0.2.0.tgz#696ce2ec0aa0e6ea93a397ffcf24aa7840c827cb"
   integrity sha512-I88TYZWc9XiYHRQ4/3c5rjjfgkjhLyW2luGIheGERbNQ6OY7yTybanSpDXZa8y7VUP9YmDcYa+eyq4ca7iLqWA==
 
-effect-ts@^0.0.1:
-  version "0.0.1"
-  resolved "https://registry.npmjs.org/effect-ts/-/effect-ts-0.0.1.tgz#bb8d7baea5fcfadf6f8a4ece29f521e55406e2e0"
-  integrity sha512-6ENinaszHRpC/DdWGAFCHv/RBy9NImPJARBVoWTeO1PSBOmlibuzJvBxnoHD5dwdWikFEe7l7FEfl7MQyvvmaQ==
-
 effect@3.16.12:
   version "3.16.12"
   resolved "https://registry.npmjs.org/effect/-/effect-3.16.12.tgz#3762f745846cfa4905512e397e17f683438addbe"
