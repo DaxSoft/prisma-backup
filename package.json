@@ -1,67 +1,47 @@
 {
-    "name": "@vorlefan/prisma-backup",
-    "version": "0.3.5",
-    "description": "Export all the databse models into json files and use them as backup",
-    "main": "dist/index.js",
-    "types": "dist/index.d.ts",
-    "author": {
-        "name": "Michael Willian Santos",
-        "email": "dax-soft@live.com",
-        "url": "https://daxsoft.github.io/"
-    },
-    "keywords": [
-        "prisma",
-        "database",
-        "files",
-        "backup",
-        "json"
-    ],
-    "scripts": {
-        "build": "webpack --mode production & yarn run size",
-        "lint": "eslint './src/**/*.{js,ts,tsx}'",
-        "test": "jest",
-        "test:watch": "jest --watchAll",
-        "watch": "tsc -w",
-        "start": "npm link && nodemon",
-        "semantic-release": "semantic-release",
-        "size": "bundlesize",
-        "dev": "ts-node --project tsconfig.json src/index.ts"
-    },
-    "license": "MIT",
-    "private": false,
-    "devDependencies": {
-        "@babel/core": "^7.17.0",
-        "@types/adm-zip": "^0.4.34",
-        "@types/jest": "^27.4.0",
-        "@types/node": "^17.0.15",
-        "@typescript-eslint/eslint-plugin": "^5.10.2",
-        "@typescript-eslint/parser": "^5.10.2",
-        "babel-loader": "^8.2.3",
-        "bundlesize": "^0.18.1",
-        "eslint": "^8.8.0",
-        "eslint-config-prettier": "^8.3.0",
-        "eslint-plugin-prettier": "^4.0.0",
-        "jest": "^27.5.0",
-        "nodemon": "^2.0.15",
-        "ts-jest": "^27.1.3",
-        "ts-loader": "^9.2.6",
-        "ts-node": "^10.4.0",
-        "typescript": "^4.5.5",
-        "webpack": "^5.68.0",
-        "webpack-cli": "^4.9.2"
-    },
-    "publishConfig": {
-        "access": "public"
-    },
-    "files": [
-        "dist/**/*"
-    ],
-    "repository": "daxsoft/prisma-backup",
-    "dependencies": {
-        "@vorlefan/path": "^1.7.9",
-        "adm-zip": "^0.5.9",
-        "ansi-colors": "^4.1.1",
-        "cli-progress": "^3.10.0",
-        "groq-js": "^0.3.0-beta.2"
-    }
+  "name": "@vorlefan/prisma-backup",
+  "version": "0.3.5",
+  "description": "Export all the databse models into json files and use them as backup",
+  "main": "./dist/prisma-backup.umd.js",
+  "module": "./dist/prisma-backup.es.js",
+  "types": "./dist/index.d.ts",
+  "author": {
+    "name": "Michael Willian Santos",
+    "email": "dax-soft@live.com",
+    "url": "https://daxsoft.github.io/"
+  },
+  "keywords": [
+    "prisma",
+    "database",
+    "files",
+    "backup",
+    "json"
+  ],
+  "scripts": {
+    "dev": "vite build --watch",
+    "build": "vite build",
+    "test": "jest"
+  },
+  "license": "MIT",
+  "private": false,
+  "devDependencies": {
+    "@types/jest": "^30.0.0",
+    "@types/node": "^24.3.0",
+    "jest": "^30.1.1",
+    "ts-jest": "^29.4.1",
+    "typescript": "^5.9.2",
+    "vite": "^7.1.3",
+    "vite-plugin-dts": "^4.5.4"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "dist/**/*"
+  ],
+  "repository": "daxsoft/prisma-backup",
+  "dependencies": {
+    "@vorlefan/path": "^1.8.35",
+    "effect-ts": "^0.0.1"
+  }
 }

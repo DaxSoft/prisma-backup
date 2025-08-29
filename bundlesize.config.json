@@ -1,8 +1,0 @@
-{
-    "files": [
-        {
-            "path": "./dist/*.js",
-            "maxSize": "45 kb"
-        }
-    ]
-}
