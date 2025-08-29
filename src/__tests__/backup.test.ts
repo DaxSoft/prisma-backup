@@ -9,7 +9,7 @@ const prisma = new PrismaClient();
 
 describe('PrismaBackup', () => {
   test('Without encrypting', async () => {
-    const backup = new PrismaBackup(prisma, { folderName: TMP_BACKUP_FOLDER, database: 'postgres' });
+    const backup = new PrismaBackup(prisma, { folderName: TMP_BACKUP_FOLDER, database: 'postgres', isTesting: true });
     await backup.run();
 
     const folders = Route.folders(TMP_BACKUP_FOLDER);

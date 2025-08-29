@@ -10,7 +10,7 @@ export class PrismaBackup {
   private route: PathRoute = Route;
 
   constructor(private readonly prismaClient: PrismaClient, private readonly args: PrismaBackupArgs) {
-    this.route.inject(this.args.folderName, 'root').alias('@', this.args.folderName);
+    this.route.inject(this.args.folderName, this.args?.isTesting ? 'main' : 'root').alias('@', this.args.folderName);
   }
 
   @HandleError((cause) => new PrismaBackupError(cause))
