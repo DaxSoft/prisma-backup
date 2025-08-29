@@ -17,16 +17,13 @@ describe('PrismaBackup', () => {
   //     offset: {
   //       Posts: { limit: 50 },
   //     },
-  //     compress: true,
   //   });
   //   await backup.run();
-
   //   const files = await Route.files(TMP_BACKUP_FOLDER);
   //   expect(files.length > 0).toBeTruthy();
   //   expect(!!files?.find((d) => d.name === '_prisma_migrations')).toBeTruthy();
   //   expect(!!files?.find((d) => d.name === 'backup_test')).toBeTruthy();
   // });
-
   test('Restore', async () => {
     const restore = new PrismaRestore(prisma, {
       baseModels: Prisma.dmmf.datamodel.models as any,
@@ -34,9 +31,7 @@ describe('PrismaBackup', () => {
       database: 'postgres',
       isTesting: true,
     });
-
     await restore.run();
-
     expect(true).toBeTruthy();
   });
 });
