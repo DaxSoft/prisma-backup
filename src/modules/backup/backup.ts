@@ -19,7 +19,11 @@ export class PrismaBackup {
 
     for (const table of tables) {
       const cursorConfig = this.args.cursor?.[table.table_name];
-      await this.saveTable(table);
+      if (cursorConfig) {
+        await this.saveTableCursor(table, cursorConfig);
+      } else {
+        await this.saveTable(table);
+      }
     }
   }
 
@@ -46,7 +50,7 @@ export class PrismaBackup {
           SELECT * FROM "${table.table_name}"
           ${whereClause}
           ORDER BY "${cursorConfig.field}" ASC
-          LIMIT ${cursorConfig.limit};
+          LIMIT ${cursorConfig.limit + 1};
         `;
 
       const batch: any[] = await this.prismaClient.$queryRawUnsafe(query);
