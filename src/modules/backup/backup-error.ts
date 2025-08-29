@@ -5,3 +5,23 @@ export class PrismaBackupError extends TaggedError<'PrismaBackup'> {
     super('PrismaBackup', 'A prisma-backup error occurred', cause);
   }
 }
+
+export class PrismaBackupGetAllTableNameError extends TaggedError<'PrismaBackupGetAllTableNameError'> {
+  constructor(cause?: unknown) {
+    super(
+      'PrismaBackupGetAllTableNameError',
+      'A error occured when trying to fetch the table name and row count from your prisma client.',
+      cause
+    );
+  }
+}
+
+export class PrismaBackupSaveTableJsonError extends TaggedError<'PrismaBackupSaveTableJsonError'> {
+  constructor(cause?: unknown) {
+    super(
+      'PrismaBackupSaveTableJsonError',
+      'A error occured when trying to save the data from the table of the database',
+      cause
+    );
+  }
+}

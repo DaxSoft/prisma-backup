@@ -15,7 +15,7 @@ export async function genCryptoKey(
   });
 }
 
-export function filename(str: string): string {
+export function sanitizeFilename(str: string): string {
   const sanitized = str
     .replace(/[\/\?<>\\:\*\|":]/g, '')
     .replace(/[\x00-\x1f\x80-\x9f]/g, '')
