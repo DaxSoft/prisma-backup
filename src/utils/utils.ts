@@ -1,4 +1,4 @@
-import crypto, { BinaryLike } from "node:crypto";
+import crypto, { BinaryLike } from 'node:crypto';
 
 export async function genCryptoKey(
   password: BinaryLike,
@@ -6,26 +6,21 @@ export async function genCryptoKey(
   keylen: number
 ): Promise<Buffer | undefined> {
   return new Promise((resolve, reject) => {
-    crypto.scrypt(
-      password,
-      salt,
-      keylen,
-      function (err: Error | null, derivedKey: Buffer) {
-        if (err) {
-          reject(undefined);
-        }
-        resolve(derivedKey);
+    crypto.scrypt(password, salt, keylen, function (err: Error | null, derivedKey: Buffer) {
+      if (err) {
+        reject(undefined);
       }
-    );
+      resolve(derivedKey);
+    });
   });
 }
 
 export function filename(str: string): string {
   const sanitized = str
-    .replace(/[\/\?<>\\:\*\|":]/g, "")
-    .replace(/[\x00-\x1f\x80-\x9f]/g, "")
-    .replace(/^\.+$/, "")
-    .replace(/^(con|prn|aux|nul|com[0-9]|lpt[0-9])(\..*)?$/i, "")
-    .replace(/\s/gim, "_");
-  return sanitized.split("").splice(0, 255).join("");
+    .replace(/[\/\?<>\\:\*\|":]/g, '')
+    .replace(/[\x00-\x1f\x80-\x9f]/g, '')
+    .replace(/^\.+$/, '')
+    .replace(/^(con|prn|aux|nul|com[0-9]|lpt[0-9])(\..*)?$/i, '')
+    .replace(/\s/gim, '_');
+  return sanitized.split('').splice(0, 255).join('');
 }
