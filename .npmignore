@@ -1,7 +1,18 @@
-src/
-node_modules
-docs/
-examples/
-test/
-backup_test
-coverage
+# .npmignore
+
+# Exclude folders
+/prisma
+/__tests__
+/node_modules
+/src
+
+# Exclude config files
+vite.config.ts
+vitest.config.ts
+tsconfig.json
+.env
+*.log
+
+# Exclude Git files
+.git
+.gitignore

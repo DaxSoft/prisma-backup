@@ -1,0 +1,1 @@
+[{"id":"e6f355bf-2005-42a9-90a5-8d53ed188cbd","checksum":"9ad3a9be75e2fa20bf898148f38295fdbdf222571f7a1dbf8435c223d2f21902","finished_at":"2025-08-29T16:31:46.348Z","migration_name":"20250829163146_example","logs":null,"rolled_back_at":null,"started_at":"2025-08-29T16:31:46.321Z","applied_steps_count":1,"__table_name":"_prisma_migrations","__row_count":1}]

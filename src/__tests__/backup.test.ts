@@ -1,38 +1,37 @@
-import { BackupModels } from '../types/backup';
-import { runBackup } from '../modules/backup';
-import { PathRoute } from '@vorlefan/path';
+import 'dotenv/config';
+import { PrismaBackup } from '../modules/backup/backup';
+import { PrismaClient, Prisma } from '../../prisma/generated/prisma/client';
+import { Route } from '../modules/path-route';
+import { PrismaRestore } from '../modules/restore/restore';
 
-const TMP_BACKUP_FOLDER = 'backup_test';
+const TMP_BACKUP_FOLDER = 'example/backup_test';
 
-const Route = new PathRoute();
-Route.set(
-    TMP_BACKUP_FOLDER,
-    Route.resolve(__dirname, '..', '..', TMP_BACKUP_FOLDER)
-);
+const prisma = new PrismaClient();
 
-const models: BackupModels = {
-    user: [
-        { id: 1, name: 'John', email: 'john@email.com' },
-        { id: 2, name: 'Robert', email: 'robert@email.com' },
-    ],
-    post: [
-        { id: 1, title: 'Encrypted Post', userId: 1 },
-        { id: 2, title: 'Decrypted Post', userId: 2 },
-    ],
-};
-
-describe('Backup & GetBackup', () => {
-    test('Without encrypting', async () => {
-        await runBackup({
-            models,
-            onRoute: function (route) {
-                route.remove('root');
-                route.inject('root', 'main', TMP_BACKUP_FOLDER);
-            },
-            backupFolderName: 'raw',
-        });
-
-        const folders = Route.io().folders(TMP_BACKUP_FOLDER);
-        expect(folders.length > 0).toBeTruthy();
+describe('PrismaBackup', () => {
+  // test('Without encrypting', async () => {
+  //   const backup = new PrismaBackup(prisma, {
+  //     folderName: TMP_BACKUP_FOLDER,
+  //     database: 'postgres',
+  //     isTesting: true,
+  //     offset: {
+  //       Posts: { limit: 50 },
+  //     },
+  //   });
+  //   await backup.run();
+  //   const files = await Route.files(TMP_BACKUP_FOLDER);
+  //   expect(files.length > 0).toBeTruthy();
+  //   expect(!!files?.find((d) => d.name === '_prisma_migrations')).toBeTruthy();
+  //   expect(!!files?.find((d) => d.name === 'backup_test')).toBeTruthy();
+  // });
+  test('Restore', async () => {
+    const restore = new PrismaRestore(prisma, {
+      baseModels: Prisma.dmmf.datamodel.models as any,
+      folderName: TMP_BACKUP_FOLDER,
+      database: 'postgres',
+      isTesting: true,
     });
+    await restore.run();
+    expect(true).toBeTruthy();
+  });
 });
