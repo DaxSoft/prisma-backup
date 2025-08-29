@@ -4,7 +4,6 @@ import { PrismaClient } from '../../prisma/generated/prisma/client/client';
 import { Route } from '../modules/path-route';
 
 const TMP_BACKUP_FOLDER = 'example/backup_test';
-const TMP_BACKUP_ENCRYPT_FOLDER = 'example/backup_test_encrypt';
 
 const prisma = new PrismaClient();
 
