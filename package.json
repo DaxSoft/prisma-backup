@@ -41,7 +41,9 @@
   ],
   "repository": "daxsoft/prisma-backup",
   "dependencies": {
+    "@prisma/client": "^6.15.0",
     "@vorlefan/path": "^1.8.35",
-    "effect-ts": "^0.0.1"
+    "effect-ts": "^0.0.1",
+    "prisma": "^6.15.0"
   }
 }
