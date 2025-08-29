@@ -5,6 +5,7 @@
   "main": "./dist/prisma-backup.umd.js",
   "module": "./dist/prisma-backup.es.js",
   "types": "./dist/index.d.ts",
+  "type": "module",
   "author": {
     "name": "Michael Willian Santos",
     "email": "dax-soft@live.com",
