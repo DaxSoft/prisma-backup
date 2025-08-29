@@ -13,8 +13,8 @@ describe('PrismaBackup', () => {
       folderName: TMP_BACKUP_FOLDER,
       database: 'postgres',
       isTesting: true,
-      cursor: {
-        Posts: { limit: 50, field: 'createdAt' },
+      offset: {
+        Posts: { limit: 50 },
       },
     });
     await backup.run();

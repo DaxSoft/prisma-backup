@@ -2,4 +2,4 @@ export type { EncryptDataProps, EncryptDataResult, DecryptDataProps } from './cr
 
 export type { Err, Ok, Result, ErrorMapper, ResultAsync } from './error.types';
 
-export type { CursorConfig, PrismaBackupArgs, QueryTableNameWithRowCount } from './prisma-backup.types';
+export type { OffsetConfig, PrismaBackupArgs, QueryTableNameWithRowCount } from './prisma-backup.types';

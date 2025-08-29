@@ -1,14 +1,13 @@
-export type CursorConfig = {
+export type OffsetConfig = {
   limit: number; // The batch size for each query
-  field: string; // The unique, ordered field to paginate on (e.g., 'id', 'createdAt')
 };
 
 export type PrismaBackupArgs = {
   folderName: string;
   database: 'postgres';
   isTesting?: boolean;
-  cursor?: {
-    [tableName: string]: CursorConfig;
+  offset?: {
+    [tableName: string]: OffsetConfig;
   };
 };
 

@@ -1,7 +1,7 @@
 import type { PrismaClient } from '@prisma/client';
 import { HandleError } from '../../decorators/handle-error.decorator';
 import { PrismaBackupError, PrismaBackupGetAllTableNameError, PrismaBackupSaveTableJsonError } from './backup-error';
-import type { CursorConfig, PrismaBackupArgs, QueryTableNameWithRowCount } from '../../types';
+import type { OffsetConfig, PrismaBackupArgs, QueryTableNameWithRowCount } from '../../types';
 import { PathRoute } from '@vorlefan/path';
 import { Route } from '../path-route';
 import { sanitizeFilename } from '../../utils/utils';
@@ -18,9 +18,9 @@ export class PrismaBackup {
     const tables = await this.getAllTableNamesWithCount();
 
     for (const table of tables) {
-      const cursorConfig = this.args.cursor?.[table.table_name];
-      if (cursorConfig) {
-        await this.saveTableCursor(table, cursorConfig);
+      const offsetConfig = this.args.offset?.[table.table_name];
+      if (offsetConfig) {
+        await this.saveTableOffset(table, offsetConfig);
       } else {
         await this.saveTable(table);
       }
@@ -28,54 +28,35 @@ export class PrismaBackup {
   }
 
   @HandleError((cause) => new PrismaBackupSaveTableJsonError(cause))
-  protected async saveTableCursor(table: QueryTableNameWithRowCount, cursorConfig: CursorConfig) {
-    // --- CURSOR LOGIC ---
-    console.log(
-      `Using cursor for table "${table.table_name}" with limit ${cursorConfig.limit} on field "${cursorConfig.field}"`
-    );
-    let lastCursorValue: any | undefined = undefined;
+  protected async saveTableOffset(table: QueryTableNameWithRowCount, offsetConfig: OffsetConfig) {
+    console.log(`Using offset for table "${table.table_name}" with limit ${offsetConfig.limit}"`);
 
-    const rows: any[] = [];
+    const allRows: any[] = [];
+    let offset: number = 0;
 
-    // Start the pagination loop
     while (true) {
-      // Build the WHERE clause if we have a cursor value from the previous batch
-      const whereClause =
-        lastCursorValue !== undefined
-          ? `WHERE "${cursorConfig.field}" > ${this.formatCursorValue(lastCursorValue)}`
-          : '';
-
-      // Construct the paginated query
       const query = `
-          SELECT * FROM "${table.table_name}"
-          ${whereClause}
-          ORDER BY "${cursorConfig.field}" ASC
-          LIMIT ${cursorConfig.limit + 1};
-        `;
+        SELECT * FROM "${table.table_name}"
+        OFFSET ${offset}
+        LIMIT ${offsetConfig.limit};
+      `;
 
       const batch: any[] = await this.prismaClient.$queryRawUnsafe(query);
 
-      // If the batch is empty, we've fetched all rows
+      // If the database returns nothing, we are definitely done.
       if (batch.length === 0) {
         break;
       }
 
-      // Add the fetched rows to our main array
-      rows.push(...batch);
+      allRows.push(...batch);
 
-      // Update the cursor value with the last item's field from the current batch
-      lastCursorValue = batch[batch.length - 1][cursorConfig.field];
-
-      // If the number of rows returned is less than the limit, it means we are on the last page
-      if (batch.length < cursorConfig.limit) {
-        break;
-      }
+      offset += offsetConfig.limit + 1;
     }
 
     const filename = sanitizeFilename(`${table.table_name}.json`);
     const filepath = this.route.plug('@', filename)!;
 
-    const data = rows.map((row: any) => ({ ...row, __table_name: table.table_name, __row_count: table.row_count }));
+    const data = allRows.map((row: any) => ({ ...row, __table_name: table.table_name, __row_count: table.row_count }));
     const status = await this.route.stream().write(filepath, JSON.stringify(data));
 
     if (!status) {
