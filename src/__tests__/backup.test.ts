@@ -3,7 +3,7 @@ import { PrismaBackup } from '../modules/backup/backup';
 import { PrismaClient } from '../../prisma/generated/prisma/client/client';
 import { Route } from '../modules/path-route';
 
-const TMP_BACKUP_FOLDER = 'backup_test';
+const TMP_BACKUP_FOLDER = 'example/backup_test';
 
 const prisma = new PrismaClient();
 

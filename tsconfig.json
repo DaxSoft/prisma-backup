@@ -10,8 +10,9 @@
     "isolatedModules": true,
     "noEmit": true,
     "emitDecoratorMetadata": true,
-    "experimentalDecorators": true
+    "experimentalDecorators": true,
+    "types": ["vitest/globals"]
   },
-  "include": ["src", "prisma"],
+  "include": ["src", "prisma", "vite.config.ts"],
   "exclude": ["node_modules", "dist", "example"]
 }
