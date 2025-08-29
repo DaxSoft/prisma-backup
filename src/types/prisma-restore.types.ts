@@ -13,4 +13,9 @@ export type PrismaRestoreArgs = {
   password?: string;
   ignoredTables?: string[];
   baseModels: Array<Record<string, any>>;
+  waitBetweenModels?: number;
+  transaction?: {
+    maxWait: number; // 15 segundos
+    timeout: number; // 30 segundos
+  };
 };

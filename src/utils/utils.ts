@@ -49,3 +49,5 @@ export function pick<T extends Record<string, any>, K extends keyof T>(record: T
   }
   return result;
 }
+
+export const sleep = (ms: number) => new Promise((resolve, reject) => setTimeout(() => resolve(true), ms));

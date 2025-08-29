@@ -11,3 +11,9 @@ export class PrismaInsertionOrderError extends TaggedError<'PrismaInsertionOrder
     super('PrismaInsertionOrderError', 'A error occured when trying to get the insertion order', cause);
   }
 }
+
+export class PrismaInsertModelError extends TaggedError<'PrismaInsertModelError'> {
+  constructor(cause?: unknown) {
+    super('PrismaInsertModelError', 'A error occured when trying to insert the model', cause);
+  }
+}

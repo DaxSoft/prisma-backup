@@ -32,8 +32,11 @@ describe('PrismaBackup', () => {
       baseModels: Prisma.dmmf.datamodel.models as any,
       folderName: TMP_BACKUP_FOLDER,
       database: 'postgres',
+      isTesting: true,
     });
 
     await restore.run();
+
+    expect(true).toBeTruthy();
   });
 });

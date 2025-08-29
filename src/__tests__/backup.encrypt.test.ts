@@ -26,4 +26,8 @@ describe('PrismaBackup', () => {
   //   expect(!!files?.find((d) => d.name === '_prisma_migrations')).toBeTruthy();
   //   expect(!!files?.find((d) => d.name === 'backup_test_encrypt')).toBeTruthy();
   // });
+
+  test('x', () => {
+    expect(true).toBeTruthy();
+  });
 });

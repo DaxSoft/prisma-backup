@@ -5,14 +5,22 @@ import {
   PrismaRestoreArgs,
 } from '../../types/prisma-restore.types';
 import { HandleError } from '../../decorators/handle-error.decorator';
-import { PrismaInsertionOrderError, PrismaRestoreError } from './restore-error';
-import { pick } from '../../utils/utils';
+import { PrismaInsertionOrderError, PrismaInsertModelError, PrismaRestoreError } from './restore-error';
+import { omit, pick, sleep, toCamelCase } from '../../utils/utils';
+import { Route } from '../path-route';
+import { PathRoute } from '@vorlefan/path';
 
 export class PrismaRestore {
+  private route: PathRoute = Route;
   private ignored_tables: Set<string> = new Set(['_prisma_migrations']);
 
   constructor(private readonly prismaClient: PrismaClient, private readonly args: PrismaRestoreArgs) {
+    this.route.inject(this.args.folderName, this.args?.isTesting ? 'main' : 'root').alias('@', this.args.folderName);
     this.args?.ignoredTables?.map((table) => this.ignored_tables.add(table));
+    this.args.transaction = {
+      maxWait: this.args?.transaction?.maxWait ?? 15000,
+      timeout: this.args?.transaction?.maxWait ?? 30000,
+    };
   }
 
   @HandleError((cause) => new PrismaRestoreError(cause))
@@ -20,6 +28,41 @@ export class PrismaRestore {
     const models = await this.getInsertionOrder();
 
     console.log(models);
+
+    for (const model of models) {
+      console.log(model);
+      await this.insertModel(model);
+      await sleep(this.args?.waitBetweenModels || 1e3);
+    }
+  }
+
+  @HandleError((cause) => new PrismaInsertModelError(cause))
+  protected async insertModel(model: string) {
+    const filename = `${model}.json`;
+    console.log(filename, this.route.plug('@', filename));
+
+    const content = await this.route.stream().read(this.route.plug('@', filename)!);
+    if (!content) {
+      throw new Error(`Not found restored json of ${model} model.`);
+    }
+    const data = JSON.parse(content);
+    const rows = data.map((row: Record<any, any>) => omit(row, ['__table_name', '__row_count']));
+
+    if (!Array.isArray(data) || data.length === 0) {
+      console.warn(`- Table '${model}' is empty. Skipping.`);
+      return;
+    }
+
+    console.log(rows[0]);
+
+    await this.prismaClient.$transaction(async (tx: any) => {
+      const delegate = tx[toCamelCase(model)];
+      if (!delegate) {
+        throw new Error(`Model '${model}' not found on Prisma Client.`);
+      }
+
+      await delegate.createMany({ data: rows });
+    }, this.args.transaction);
   }
 
   @HandleError((cause) => new PrismaInsertionOrderError(cause))
@@ -38,6 +81,7 @@ export class PrismaRestore {
         }),
       } as PrismaDMMFDataModelBase;
     });
+
     const sortedOrder: Set<string> = new Set();
     const modelMap: Map<string, PrismaDMMFDataModelBase> = new Map(models.map((model) => [model.name, model]));
     const dependencies = new Map<string, string[]>();
@@ -82,10 +126,8 @@ export class PrismaRestore {
       }
     }
 
-    if (sortedOrder.size !== models.length - this.ignored_tables.size) {
-      throw new Error(
-        'Erro de dependência cíclica detectado no schema do Prisma. Não foi possível determinar a ordem de inserção.'
-      );
+    if (sortedOrder.size !== models.length) {
+      throw new Error('Circular dependecy error.');
     }
 
     return Array.from(sortedOrder.values());
