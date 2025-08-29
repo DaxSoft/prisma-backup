@@ -23,5 +23,6 @@ describe('PrismaBackup', () => {
     const files = await Route.files(TMP_BACKUP_FOLDER);
     expect(files.length > 0).toBeTruthy();
     expect(!!files?.find((d) => d.name === '_prisma_migrations')).toBeTruthy();
+    expect(!!files?.find((d) => d.name === 'backup_test')).toBeTruthy();
   });
 });

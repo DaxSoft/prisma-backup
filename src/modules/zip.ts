@@ -22,5 +22,5 @@ export async function compressBackup(route: PathRoute) {
 
   const filename = route.basename(route.get('@')?.routePath!, '');
 
-  await writeZip(zip, route.plug('root', `${filename}.zip`)!);
+  await writeZip(zip, route.plug('@', `${filename}.zip`)!);
 }

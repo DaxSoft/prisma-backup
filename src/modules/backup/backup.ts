@@ -48,7 +48,7 @@ export class PrismaBackup {
 
   @HandleError((cause) => new PrismaBackupCompressError(cause))
   protected async compress() {
-    if (this.args?.compress) {
+    if (this.args?.compress === true) {
       await compressBackup(this.route);
     }
   }
