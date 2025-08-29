@@ -45,6 +45,7 @@
   "dependencies": {
     "@prisma/client": "^6.15.0",
     "@vorlefan/path": "^1.8.35",
+    "dotenv": "^17.2.1",
     "prisma": "^6.15.0"
   }
 }
