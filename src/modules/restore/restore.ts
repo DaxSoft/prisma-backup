@@ -1,7 +1,12 @@
 import { PrismaClient } from '@prisma/client';
-import { PrismaDMMFDataModelBase, PrismaRestoreArgs } from '../../types/prisma-restore.types';
+import {
+  PrismaDMMFDataModelBase,
+  PrismaDMMFDataModelBaseFields,
+  PrismaRestoreArgs,
+} from '../../types/prisma-restore.types';
 import { HandleError } from '../../decorators/handle-error.decorator';
 import { PrismaInsertionOrderError, PrismaRestoreError } from './restore-error';
+import { pick } from '../../utils/utils';
 
 export class PrismaRestore {
   private ignored_tables: Set<string> = new Set(['_prisma_migrations']);
@@ -19,7 +24,20 @@ export class PrismaRestore {
 
   @HandleError((cause) => new PrismaInsertionOrderError(cause))
   protected async getInsertionOrder(): Promise<string[]> {
-    const models = this.args.baseModels;
+    const models = this.args.baseModels.map((model) => {
+      const { fields } = pick(model, ['fields']);
+      return {
+        name: model.name,
+        fields: fields.map((field: any) => {
+          const args = pick(field, ['type', 'relationFromFields']);
+
+          return {
+            type: args.type,
+            relationFromFields: args?.relationFromFields || [],
+          } as PrismaDMMFDataModelBaseFields;
+        }),
+      } as PrismaDMMFDataModelBase;
+    });
     const sortedOrder: Set<string> = new Set();
     const modelMap: Map<string, PrismaDMMFDataModelBase> = new Map(models.map((model) => [model.name, model]));
     const dependencies = new Map<string, string[]>();

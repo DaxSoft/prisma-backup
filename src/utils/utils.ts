@@ -29,3 +29,23 @@ export function toCamelCase(str: string): string {
   if (!str) return '';
   return str.charAt(0).toLowerCase() + str.slice(1);
 }
+
+export function omit<T extends Record<string, any>, K extends keyof T>(record: T, keys: K[]): Omit<T, K> {
+  const result: Partial<T> = {};
+  for (const key in record) {
+    if (!keys.includes(key as any)) {
+      result[key] = record[key];
+    }
+  }
+  return result as Omit<T, K>;
+}
+
+export function pick<T extends Record<string, any>, K extends keyof T>(record: T, keys: K[]): Pick<T, K> {
+  const result = {} as Pick<T, K>;
+  for (const key of keys) {
+    if (key in record) {
+      result[key] = record[key];
+    }
+  }
+  return result;
+}
