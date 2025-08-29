@@ -2,6 +2,7 @@ import { takeLeft } from './../../../node_modules/effect/src/String';
 import type { PrismaClient } from '@prisma/client';
 import { HandleError } from '../../decorators/handle-error.decorator';
 import {
+  PrismaBackupCompressError,
   PrismaBackupError,
   PrismaBackupGetAllTableNameError,
   PrismaBackupQueryDataError,
@@ -13,6 +14,7 @@ import { PathRoute } from '@vorlefan/path';
 import { Route } from '../path-route';
 import { sanitizeFilename } from '../../utils/utils';
 import { encrypt } from '../crypto';
+import { compressBackup } from '../zip';
 
 export class PrismaBackup {
   private route: PathRoute = Route;
@@ -39,6 +41,15 @@ export class PrismaBackup {
       } else {
         await this.saveTable(table);
       }
+    }
+
+    await this.compress();
+  }
+
+  @HandleError((cause) => new PrismaBackupCompressError(cause))
+  protected async compress() {
+    if (this.args?.compress) {
+      await compressBackup(this.route);
     }
   }
 

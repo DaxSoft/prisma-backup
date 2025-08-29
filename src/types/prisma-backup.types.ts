@@ -11,6 +11,7 @@ export type PrismaBackupArgs = {
   };
   encrypt?: boolean;
   password?: string;
+  compress?: boolean;
 };
 
 export type QueryTableNameWithRowCount = { table_name: string; row_count: number };

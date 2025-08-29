@@ -43,3 +43,9 @@ export class PrismaBackupTransformContentError extends TaggedError<'PrismaBackup
     super('PrismaBackupTransformContentError', 'A error occured when trying to transform content data', cause);
   }
 }
+
+export class PrismaBackupCompressError extends TaggedError<'PrismaBackupCompressError'> {
+  constructor(cause?: unknown) {
+    super('PrismaBackupCompressError', 'A error occured when trying to compress backup data', cause);
+  }
+}

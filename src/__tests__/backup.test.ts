@@ -16,6 +16,7 @@ describe('PrismaBackup', () => {
       offset: {
         Posts: { limit: 50 },
       },
+      compress: true,
     });
     await backup.run();
 
